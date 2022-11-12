@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const Form = require("../models/formSubmit");
+const NewsLetter = require("../models/newsLetterSubmit");
 const { v4: uuidv4 } = require("uuid");
 const nodemailer = require("nodemailer");
 
-const mail = async (id, name, email, subject, message, html = false) => {
+const mail = async (id, email, subject, html = false) => {
   try {
     var smtpConfig = {
       host: "smtp.gmail.com",
@@ -23,7 +23,7 @@ const mail = async (id, name, email, subject, message, html = false) => {
       from: process.env.MAILING_ACCOUNT, // sender address
       to: process.env.MAILING_TO_ACCOUNT, // list of receivers
       subject: subject, // Subject line
-      text: `id: ${id}, Name: ${name}, Email: ${email}, Message: ${message}`, //, // plaintext body
+      text: `id: ${id}, Email: ${email}`, //, // plaintext body
       html: html === false ? null : html, // You can choose to send an HTML body instead
     };
 
@@ -41,20 +41,15 @@ const mail = async (id, name, email, subject, message, html = false) => {
   }
 };
 
-router.post("/create", (req, res) => {
+router.post("/send", (req, res) => {
   let id = uuidv4();
-  if (
-    mail(id, req.body.name, req.body.email, "Form Submittion", req.body.message)
-  ) {
-    const form = new Form({
+  if (mail(id, req.body.email, "News Letter")) {
+    const newsLetter = new NewsLetter({
       _id: id,
-      name: req.body.name,
       email: req.body.email,
-      phone_number: req.body.phone_number,
-      message: req.body.message,
     });
 
-    form
+    newsLetter
       .save()
       .then((data) => res.status(200).json(data))
       .catch((err) =>

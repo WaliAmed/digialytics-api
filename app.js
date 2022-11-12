@@ -3,12 +3,17 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 require("dotenv/config");
+const cors = require("cors");
 
 app.use(bodyParser.json());
+app.use(cors());
 
 //Routes Import
 const form = require("./routes/formSubmit");
 app.use("/form", form);
+
+const newsLetter = require("./routes/newsLetterSubmit");
+app.use("/newsLetter", newsLetter);
 
 //Routes
 app.get("/", (req, res) => {
