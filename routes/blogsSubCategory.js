@@ -1,28 +1,31 @@
 const express = require("express");
 const router = express.Router();
-const Blogs = require("../models/blogs.js");
-const BlogsSubCategory = require("../models/blogsSubCategory.js");
+const blogsSubCategory = require("../models/blogsSubCategory.js");
+const BlogsCategory = require("../models/blogsCategory.js");
 const { v4: uuidv4 } = require("uuid");
-const e = require("express");
 
 router.post("/add", (req, res) => {
-  let id = uuidv4();
-
-  if (req.query.sub_category_id) {
-    let categoryId = req.query.sub_category_id;
-
-    BlogsSubCategory.find({}, { _id: categoryId, title: 1, category: 1 })
+  if (req.query.query_id) {
+    let id = uuidv4();
+    let categoryId = req.query.category_id;
+    BlogsCategory.find({}, { _id: categoryId, title: 1 })
       .then((data) => {
-        if (data.length > 0) {
-          const blog = new Blogs({
+        if (data.length === 0) {
+          res.status(400).json({
+            status: false,
+            message: "no data found",
+          });
+        } else {
+          const blogsubCategory = new blogsSubCategory({
             _id: id,
             title: req.body.title,
-            image: req.body.image,
-            description: req.body.description,
-            sub_category: data[0],
+            category: {
+              category_id: data[0].id,
+              category_title: data[0].title,
+            },
           });
 
-          blog
+          blogsubCategory
             .save()
             .then((data) => res.status(200).json(data))
             .catch((err) =>
@@ -30,11 +33,6 @@ router.post("/add", (req, res) => {
                 message: err,
               })
             );
-        } else {
-          res.status(400).json({
-            status: false,
-            message: "sub_category_id not found",
-          });
         }
       })
       .catch((err) =>
@@ -45,13 +43,14 @@ router.post("/add", (req, res) => {
   } else {
     res.status(400).json({
       status: false,
-      message: "sub_category_id missing",
+      message: "category_id missing",
     });
   }
 });
 
 router.get("/get", (req, res) => {
-  Blogs.find()
+  blogsSubCategory
+    .find()
     .then((data) => res.status(200).json(data))
     .catch((err) =>
       res.status(500).json({
@@ -61,7 +60,8 @@ router.get("/get", (req, res) => {
 });
 
 router.delete("/delete", (req, res) => {
-  Blogs.deleteOne({ _id: req.query._id })
+  blogsSubCategory
+    .deleteOne({ _id: req.query._id })
     .then((data) => res.status(200).json(data))
     .catch((err) =>
       res.status(500).json({
@@ -71,14 +71,13 @@ router.delete("/delete", (req, res) => {
 });
 
 router.patch("/update", (req, res) => {
-  Blogs.updateOne(
-    { _id: req.query._id },
-    {
-      title: req.body.title,
-      image: req.body.image,
-      description: req.body.description,
-    }
-  )
+  blogsSubCategory
+    .updateOne(
+      { _id: req.query._id },
+      {
+        title: req.body.title,
+      }
+    )
     .then((data) => res.status(200).json(data))
     .catch((err) =>
       res.status(500).json({

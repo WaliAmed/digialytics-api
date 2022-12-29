@@ -18,12 +18,8 @@ const BlogSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    blog_html: {
-      type: String,
-      required: true,
-    },
-    time_to_read: {
-      type: Number,
+    sub_category: {
+      type: Object,
       required: true,
     },
   },

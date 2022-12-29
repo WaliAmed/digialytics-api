@@ -23,6 +23,12 @@ app.use("/newsLetter", newsLetter);
 const Blogs = require("./routes/blogs");
 app.use("/blogs", Blogs);
 
+const BlogsCategory = require("./routes/blogsCategory");
+app.use("/blogs-category", BlogsCategory);
+
+const BlogsSubCategory = require("./routes/blogsSubCategory");
+app.use("/blogs-sub-category", BlogsSubCategory);
+
 const Products = require("./routes/products");
 app.use("/products", Products);
 
